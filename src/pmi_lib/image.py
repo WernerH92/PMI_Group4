@@ -2,6 +2,7 @@ import numpy as np
 from typing import Any, Dict, Optional
 import numpy.typing as npt
 
+
 class Image:
     """A class to represent an image with pixel data and spacing information."""
 

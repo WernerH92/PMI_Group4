@@ -2,6 +2,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import mylib
 
 from pathlib import Path
 
