@@ -1,0 +1,9 @@
+.venv/
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.pyc
+src/pmi_lib/*.so
+src/pmi_lib/*.dll
+src/pmi_lib/*.dylib
