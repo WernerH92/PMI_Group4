@@ -5,12 +5,12 @@ import os
 import numpy as np
 from pmi_viewer import view
 
-from .convert import dicom_to_nifti
-from .dicom import read_dicom
-from .filters import bilateral_filter, bilateral_filter_py, masked_gaussian_filter
-from .image import DicomImage, Image
-from .nifti import read_nifti
-from .spheres import add_sphere, add_sphere_np, add_sphere_py
+from pmi_lib.convert import dicom_to_nifti
+from pmi_lib.dicom import read_dicom
+from pmi_lib.filters import bilateral_filter, bilateral_filter_py, masked_gaussian_filter
+from pmi_lib.image import DicomImage, Image, SphericalMeasurement
+from pmi_lib.nifti import read_nifti
+from pmi_lib.spheres import add_sphere, add_sphere_np, add_sphere_py
 
 
 def pathfinder(filename: str) -> str | None:
@@ -101,3 +101,13 @@ def test_spheres() -> None:
             (np.asarray(first) - np.asarray(second)) ** 2
         )
         print(f"Mean squared difference ({label}): {mean_squared_difference}")
+
+
+
+
+image = read_nifti("C:/Users/20234362/pmi/images/ct_jaw.nii.gz")
+measurement = SphericalMeasurement(20, {'mean': np.mean, 'stddev': np.std, 'max': np.max})
+result = measurement(image, 381, 300, 60)
+print(result)
+
+view(result['image'])

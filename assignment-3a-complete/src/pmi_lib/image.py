@@ -112,3 +112,39 @@ class DicomImage(Image):
             and self.metadata == other.metadata
         )
 
+class SphericalMeasurement:
+    def __init__(self,
+                radius: float,
+                functions: dict[str, Callable]):   
+        if not isinstance(radius, (int,float)) or radius <= 0:
+            raise ValueError('radius must be a positive integer or float.')
+        elif type(functions) != dict:
+            raise ValueError('function imput must be a dictionary.')
+
+        else:
+            self.radius = radius
+            self.functions = functions
+        
+    def __call__(self,
+                image: Image,
+                x: int, y: int, z: int) -> dict[str, Any]:
+        if not isinstance(image, Image):
+            raise ValueError('input image must be an Image object.')
+        if not all(isinstance(i, int) for i in (x,y,z)):
+            raise ValueError('input coordinates must be integer values.') 
+        
+        self.image = image
+        self.voxels = [x, y, z]
+
+        data = np.array(image._data)
+        selection = data[0:z,0:y,0:x] # ADD CIRCLE SELECTION HERE !! # # # # #
+
+        #create flattened image & initialize results dictionary.
+        flattened_pixel_data = selection.flatten()
+        results = {}
+        for key, value in self.functions.items(): #for every statistic in binary:
+            f = value   #f is one function (value)
+            results[key] = f(flattened_pixel_data)
+
+        results['image'] = selection
+        return results
