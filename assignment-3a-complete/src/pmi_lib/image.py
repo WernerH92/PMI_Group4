@@ -49,13 +49,14 @@ class Image:
         """Return the area of one pixel in square millimetres."""
         if len(self.spacing) < 2:
             raise ValueError("at least two dimensions are required for pixel area")
-        return float(self.spacing[0] * self.spacing[1])
+        # 2D data is (y, x); 3D data is (z, y, x).
+        return float(self.spacing[-2] * self.spacing[-1])
 
     def get_voxel_volume(self) -> float:
         """Return the volume of one voxel in cubic millimetres."""
         if len(self.spacing) < 3:
             raise ValueError("at least three dimensions are required for voxel volume")
-        return float(self.spacing[0] * self.spacing[1] * self.spacing[2])
+        return float(self.spacing[-3] * self.spacing[-2] * self.spacing[-1])
 
     def __len__(self) -> int:
         """Return the size of the first array axis."""
