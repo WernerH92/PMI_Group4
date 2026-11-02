@@ -105,7 +105,7 @@ def test_spheres() -> None:
 
 
 
-image = read_nifti("C:/Users/20234362/pmi/images/ct_jaw.nii.gz")
+image = read_nifti(r"C:\Users\20234056\PycharmProjects\Project\src\pmi_lib\images\ct_jaw.nii.gz")
 measurement = SphericalMeasurement(20, {'mean': np.mean, 'stddev': np.std, 'max': np.max})
 result = measurement(image, 381, 300, 60)
 print(result)

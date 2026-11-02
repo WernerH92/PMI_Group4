@@ -137,10 +137,53 @@ class SphericalMeasurement:
         self.voxels = [x, y, z]
 
         data = np.array(image._data)
-        selection = data[0:z,0:y,0:x] # ADD CIRCLE SELECTION HERE !! # # # # #
+        sz, sy, sx = image.spacing
 
-        #create flattened image & initialize results dictionary.
-        flattened_pixel_data = selection.flatten()
+        if data.ndim != 3:
+            raise ValueError('SphericalMeasurement requires a 3D image.')
+
+        # Calculate sphere radius in voxels
+        rx = int(np.ceil(self.radius / sx))
+        ry = int(np.ceil(self.radius / sy))
+        rz = int(np.ceil(self.radius / sz))
+
+        # Calculate crop boundaries
+        x0 = max(0, x - rx)
+        x1 = min(data.shape[2], x + rx + 1)
+        y0 = max(0, y - ry)
+        y1 = min(data.shape[1], y + ry + 1)
+        z0 = max(0, z - rz)
+        z1 = min(data.shape[0], z + rz + 1)
+
+        # Crop image around the sphere
+        cropped = data[z0:z1, y0:y1, x0:x1]
+
+        # Create coordinate grids
+        zz, yy, xx = np.indices(cropped.shape)
+
+        # Create spherical mask
+        mask = (
+            ((xx + x0 - x) * sx) ** 2 +
+            ((yy + y0 - y) * sy) ** 2 +
+            ((zz + z0 - z) * sz) ** 2
+            <= self.radius ** 2
+        )
+
+        # Extract voxel values inside the sphere
+        flattened_pixel_data = cropped[mask]
+
+        # Create a copy of the cropped image
+        selection = cropped.astype(float, copy=True)
+
+        # Calculate reference intensity
+        reference_intensity = np.percentile(cropped, 5)
+
+        # Darken the area outside the sphere
+        darkening = 0.10
+        selection[~mask] = (
+            reference_intensity +
+            darkening * (cropped[~mask] - reference_intensity)
+        )
         results = {}
         for key, value in self.functions.items(): #for every statistic in binary:
             f = value   #f is one function (value)
